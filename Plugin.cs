@@ -9,6 +9,14 @@ namespace yellow_taxi_mod
         {
             // Plugin startup logic
             Logger.LogInfo($"Plugin {PluginInfo.PLUGIN_GUID} is loaded!");
+
+            if (!ModMaster.instance)
+            {
+                Logger.LogError("Mod master is not instanced yet!");
+                return;
+            }
+
+            ModMaster.instance.ModEnableSet(true);
         }
     }
 }
