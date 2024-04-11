@@ -8,7 +8,7 @@ using System.Linq;
 using I2.Loc;
 using Extensions.Enumerable;
 
-namespace yellow_taxi_mod;
+namespace yellow_taxi_goes_ap;
 
 [BepInPlugin(PluginInfo.PLUGIN_GUID, PluginInfo.PLUGIN_NAME, PluginInfo.PLUGIN_VERSION)]
 public class Plugin : BaseUnityPlugin
@@ -43,7 +43,7 @@ public class Plugin : BaseUnityPlugin
 
             patched = true;
 
-            harmony = new Harmony("yellow_taxi_mod");
+            harmony = new Harmony("yellow_taxi_goes_ap");
             harmony.PatchAll(Assembly.GetExecutingAssembly());
         };
     }
