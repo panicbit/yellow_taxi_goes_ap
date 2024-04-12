@@ -13,17 +13,17 @@ public class Archipelago
     {
 
         DataEncryptionMasterExt.SetBool(Key("enabled"), Enabled);
-        DataEncryptionMasterExt.SetString(Key("Host"), Host);
-        DataEncryptionMasterExt.SetInt(Key("Port"), Port);
-        DataEncryptionMasterExt.SetString(Key("Password"), Password);
+        DataEncryptionMasterExt.SetString(Key("host"), Host);
+        DataEncryptionMasterExt.SetInt(Key("port"), Port);
+        DataEncryptionMasterExt.SetString(Key("password"), Password);
     }
 
     public static void LoadSettings()
     {
         Enabled = DataEncryptionMasterExt.GetBool(Key("enabled"), false);
         Host = DataEncryptionMasterExt.GetString(Key("host"), "archipelago.gg");
-        Port = DataEncryptionMasterExt.GetInt(Key("Port"), 0);
-        Password = DataEncryptionMasterExt.GetString(Key("Password"), "");
+        Port = DataEncryptionMasterExt.GetInt(Key("port"), 0);
+        Password = DataEncryptionMasterExt.GetString(Key("password"), "");
     }
 }
 

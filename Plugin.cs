@@ -7,6 +7,8 @@ using UnityEngine.SceneManagement;
 using System.Linq;
 using I2.Loc;
 using Extensions.Enumerable;
+using UnityEngine;
+using System;
 
 namespace yellow_taxi_goes_ap;
 
@@ -253,6 +255,27 @@ public class MenuSelectionPatch
         {
             Archipelago.Enabled = !Archipelago.Enabled;
         }
+        else if (voiceIndex == 1)
+        {
+            textInput("Host", Archipelago.Host, (host) =>
+            {
+                Archipelago.Host = host.Trim();
+            });
+        }
+        else if (voiceIndex == 2)
+        {
+            textInput("Port", Archipelago.Port.ToString(), (port) =>
+            {
+                int.TryParse(port.Trim(), out Archipelago.Port);
+            });
+        }
+        else if (voiceIndex == 3)
+        {
+            textInput("Password", Archipelago.Password, (password) =>
+            {
+                Archipelago.Password = password;
+            });
+        }
         else if (voiceIndex == 4)
         {
             MenuV2Script.instance.MenuBack();
@@ -261,6 +284,19 @@ public class MenuSelectionPatch
         }
 
         return false;
+    }
+
+    private static void textInput(string title, string input, Action<string> onConfirm)
+    {
+        MenuV2PopupScript popup = MenuV2PopupScript.SpawnNew(title, "", "", true, false);
+        // popup.BackButtonCanCloseSet();
+        popup.useInputField = true;
+        // popup.SuggestionTextSet("");
+        popup.inputField.text = input;
+        popup.onSimplePrompt = delegate
+        {
+            onConfirm(popup.inputField.text);
+        };
     }
 }
 
@@ -344,5 +380,21 @@ public class LoadPatch
     {
         Plugin.logger.LogInfo($"Loading data from slot {Data.gameDataIndex}!");
         Archipelago.LoadSettings();
+    }
+}
+
+[HarmonyPatch(typeof(MenuV2PopupScript))]
+[HarmonyPatch("Update")]
+public class PopupUpdatePatch
+{
+    static void Postfix(MenuV2PopupScript __instance)
+    {
+        if (__instance.GetPrivateField<bool>("canSelfClose"))
+        {
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                __instance.Close(false);
+            }
+        }
     }
 }
