@@ -14,6 +14,8 @@
     <PackageReference Include="BepInEx.Core" Version="5.*" />
     <PackageReference Include="BepInEx.PluginInfoProps" Version="1.*" />
     <PackageReference Include="UnityEngine.Modules" Version="2020.3.48" IncludeAssets="compile" />
+    <PackageReference Include="Archipelago.MultiClient.Net" Version="5.0.6" />
+    <PackageReference Include="System.Text.Json" Version="4.7.2" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework.TrimEnd(`0123456789`))' == 'net'">
@@ -33,8 +35,12 @@
   <Target Name="CopyDLLs" AfterTargets="Build">
     <Message Text="Executing CopyDLLs task" Importance="High" />
 
-    <Copy SourceFiles="$(TargetDir)$(ProjectName).dll;$(TargetDir)$(ProjectName).pdb"
-      DestinationFolder="C:\Program Files (x86)\Steam\steamapps\common\Yellow Taxi Goes Vroom\BepInEx\plugins" />
+    <ItemGroup>
+      <MySourceFiles Include="$(TargetDir)*.dll;$(TargetDir)$(ProjectName).pdb" />
+    </ItemGroup>
+
+    <Copy SourceFiles="@(MySourceFiles)"
+      DestinationFolder="C:\Program Files (x86)\Steam\steamapps\common\Yellow Taxi Goes Vroom\BepInEx\plugins\YellowTaxiGoesAp" />
 
     <Message Text="Copied build files" Importance="High" />
   </Target>

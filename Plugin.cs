@@ -9,6 +9,7 @@ using I2.Loc;
 using Extensions.Enumerable;
 using UnityEngine;
 using System;
+using System.Threading;
 
 namespace yellow_taxi_goes_ap;
 
@@ -48,6 +49,40 @@ public class Plugin : BaseUnityPlugin
             harmony = new Harmony("yellow_taxi_goes_ap");
             harmony.PatchAll(Assembly.GetExecutingAssembly());
         };
+
+        new Thread(() =>
+        {
+            while (true)
+            {
+                Thread.Sleep(1000);
+
+                try
+                {
+                    MapDumper.SaveMapInfos("__map_infos.json");
+                    logger.LogInfo("Saved map infos!");
+                    break;
+                    // var levelId = GameplayMaster.instance.levelId;
+                    // var mapArea = MapArea.instancePlayerInside;
+                    // var translatedAreaNameKey = LocalizationManager.GetTranslation(mapArea.areaNameKey);
+
+                    // logger.LogInfo("Current map area:");
+                    // logger.LogInfo($"    Area name key: {mapArea.areaNameKey}");
+                    // logger.LogInfo($"    Translated area name key: {translatedAreaNameKey}");
+                    // logger.LogInfo($"    Gears: {mapArea.gearsId.Count}");
+                    // logger.LogInfo($"    Bunnies: {mapArea.bunniesId.Count}");
+
+                    // foreach (var gearId in mapArea.gearsId)
+                    // {
+                    //     var collected = Data.GearStateGetAbsolute((int)levelId, gearId);
+                    //     logger.LogInfo($"    Gear: {gearId}{(collected ? " COLLECTED!" : "")}");
+                    // }
+                }
+                catch (Exception e)
+                {
+                    logger.LogError($"Dump error: {e}");
+                }
+            }
+        }).Start();
     }
 
     private void OnDestroy()
@@ -396,5 +431,28 @@ public class PopupUpdatePatch
                 __instance.Close(false);
             }
         }
+    }
+}
+
+[HarmonyPatch(typeof(ModMaster))]
+[HarmonyPatch(nameof(ModMaster.OnLoadingScreenEnd))]
+public class OnLoadingScreenEndPatch
+{
+    static void Postfix()
+    {
+        // try
+        // {
+        //     var levelId = GameplayMaster.instance.levelId;
+        //     var level = Data.GetLevel(levelId);
+        //     var levelNameInternal = level.levelName;
+        //     var levelName = level.GetName();
+        //     Plugin.logger.LogInfo($"Loaded level {levelId}:");
+        //     Plugin.logger.LogInfo($"    Name: {levelName}");
+        //     Plugin.logger.LogInfo($"    Internal name: {levelNameInternal}");
+        // }
+        // catch (Exception e)
+        // {
+        //     Plugin.logger.LogError($"OnLoadingScreenEndPatch error: {e}");
+        // }
     }
 }
