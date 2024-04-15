@@ -49,6 +49,7 @@ public class MenuVoicesInitPatch
             "Enabled: ???",
             "Host: ???",
             "Port: ???",
+            "Slot: ???",
             "Password: ???",
             LocalizationManager.GetTermTranslation("MENU_VOICE_BACK", true, 0, true, false, null, null, true),
         ]);
@@ -134,6 +135,14 @@ public class MenuSelectionPatch
         {
             return handleArchipelagoMenu();
         }
+        else if (menuIndex == 4 && voiceIndex == 0)
+        {
+            Archipelago.OnGameStart();
+        }
+        else if (menuIndex == 17 && voiceIndex == 0)
+        {
+            Archipelago.OnGameEnd();
+        }
 
         return true;
     }
@@ -196,12 +205,19 @@ public class MenuSelectionPatch
         }
         else if (voiceIndex == 3)
         {
+            textInput("Slot", Archipelago.Slot, (slot) =>
+            {
+                Archipelago.Slot = slot;
+            });
+        }
+        else if (voiceIndex == 4)
+        {
             textInput("Password", Archipelago.Password, (password) =>
             {
                 Archipelago.Password = password;
             });
         }
-        else if (voiceIndex == 4)
+        else if (voiceIndex == 5)
         {
             MenuV2Script.instance.MenuBack();
             MenuV2Script.instance.SetInstantUpdateVisualElements(false);
@@ -280,6 +296,7 @@ public class VoicesUpdatePatch
             $"Enabled: {(Archipelago.Enabled ? "Yes" : "No")}",
             $"Host: {Archipelago.Host}",
             $"Port: {Archipelago.Port}",
+            $"Slot: {Archipelago.Slot}",
             $"Password: {(Archipelago.Password.IsEmpty() ? "Not set" : "Set")}",
             LocalizationManager.GetTermTranslation("MENU_VOICE_BACK", true, 0, true, false, null, null, true),
         ];
