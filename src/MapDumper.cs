@@ -16,10 +16,10 @@ public static class MapDumper
             var map = new MapInfo()
             {
                 areaName = mapArea.areaName,
-                localAreaName = LocalizationManager.GetTranslation(mapArea.areaName),
+                localAreaName = LocalizationManager.GetTranslation(mapArea.areaName, overrideLanguage: "English"),
                 levelId = level.levelId,
                 levelName = level.levelName,
-                localLevelName = LocalizationManager.GetTranslation(level.levelName),
+                localLevelName = LocalizationManager.GetTranslation(level.levelName, overrideLanguage: "English"),
                 gearIds = mapArea.gearsId,
                 bunnyIds = mapArea.bunniesId,
             };
