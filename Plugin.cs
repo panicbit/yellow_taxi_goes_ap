@@ -58,24 +58,9 @@ public class Plugin : BaseUnityPlugin
 
                 try
                 {
-                    MapDumper.SaveMapInfos("__map_infos.json");
+                    MapDumper.SaveMapInfos("map_infos.json");
                     logger.LogInfo("Saved map infos!");
                     break;
-                    // var levelId = GameplayMaster.instance.levelId;
-                    // var mapArea = MapArea.instancePlayerInside;
-                    // var translatedAreaNameKey = LocalizationManager.GetTranslation(mapArea.areaNameKey);
-
-                    // logger.LogInfo("Current map area:");
-                    // logger.LogInfo($"    Area name key: {mapArea.areaNameKey}");
-                    // logger.LogInfo($"    Translated area name key: {translatedAreaNameKey}");
-                    // logger.LogInfo($"    Gears: {mapArea.gearsId.Count}");
-                    // logger.LogInfo($"    Bunnies: {mapArea.bunniesId.Count}");
-
-                    // foreach (var gearId in mapArea.gearsId)
-                    // {
-                    //     var collected = Data.GearStateGetAbsolute((int)levelId, gearId);
-                    //     logger.LogInfo($"    Gear: {gearId}{(collected ? " COLLECTED!" : "")}");
-                    // }
                 }
                 catch (Exception e)
                 {

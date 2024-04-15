@@ -12,11 +12,14 @@ public static class MapDumper
 
         foreach (var mapArea in MapMaster.instance.mapAreasList)
         {
+            var level = Data.GetLevel(mapArea.levelId);
             var map = new MapInfo()
             {
                 areaName = mapArea.areaName,
                 localAreaName = LocalizationManager.GetTranslation(mapArea.areaName),
-                levelId = (int)mapArea.levelId,
+                levelId = level.levelId,
+                levelName = level.levelName,
+                localLevelName = LocalizationManager.GetTranslation(level.levelName),
                 gearIds = mapArea.gearsId,
                 bunnyIds = mapArea.bunniesId,
             };
@@ -47,6 +50,8 @@ public static class MapDumper
         public string areaName { get; set; }
         public string localAreaName { get; set; }
         public int levelId { get; set; }
+        public string levelName { get; set; }
+        public string localLevelName { get; set; }
         public List<int> gearIds { get; set; }
         public List<int> bunnyIds { get; set; }
     }
