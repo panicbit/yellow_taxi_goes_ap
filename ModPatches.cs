@@ -1,5 +1,6 @@
-
 using HarmonyLib;
+
+namespace yellow_taxi_goes_ap;
 
 [HarmonyPatch(typeof(ModMaster))]
 [HarmonyPatch(nameof(ModMaster.Start))]
