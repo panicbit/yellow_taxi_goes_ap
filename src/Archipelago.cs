@@ -131,7 +131,6 @@ public class Archipelago
 
         try
         {
-
             var locationId = session.Locations.GetLocationIdFromName(GAME, name);
 
             session.Locations.CompleteLocationChecks(locationId);
