@@ -34,14 +34,7 @@ public class Archipelago
 
         Plugin.logger.LogInfo("Trying to connect to AP!");
 
-        var host = Host;
-
-        if (!host.StartsWith("ws://") || !host.StartsWith("wss://"))
-        {
-            host = $"ws://{host}";
-        }
-
-        session = ArchipelagoSessionFactory.CreateSession(host);
+        session = ArchipelagoSessionFactory.CreateSession(Host);
 
         var loginResult = session.TryConnectAndLogin(
             game: GAME,
