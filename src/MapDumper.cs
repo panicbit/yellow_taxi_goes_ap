@@ -1,8 +1,8 @@
 
 using System.Collections.Generic;
 using I2.Loc;
-using System.Text.Json;
 using System.IO;
+using Newtonsoft.Json;
 
 public static class MapDumper
 {
@@ -33,9 +33,8 @@ public static class MapDumper
     public static string MapInfosJson()
     {
         var mapInfos = MapInfos();
-        var options = new JsonSerializerOptions { WriteIndented = true };
 
-        return JsonSerializer.Serialize(mapInfos, options);
+        return JsonConvert.SerializeObject(mapInfos, Formatting.Indented);
     }
 
     public static void SaveMapInfos(string path)
