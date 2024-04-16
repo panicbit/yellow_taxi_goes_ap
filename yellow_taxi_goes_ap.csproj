@@ -39,10 +39,14 @@
     <Message Text="Executing CopyDLLs task" Importance="High" />
 
     <ItemGroup>
-      <MySourceFiles Include="$(TargetDir)*.dll;$(TargetDir)$(ProjectName).pdb" />
+      <MySourceFiles Include="$(TargetDir)$(ProjectName).dll;$(TargetDir)$(ProjectName).pdb" />
     </ItemGroup>
 
     <Copy SourceFiles="@(MySourceFiles)"
+      DestinationFolder="C:\Program Files (x86)\Steam\steamapps\common\Yellow Taxi Goes Vroom\BepInEx\plugins\YellowTaxiGoesAp" />
+
+    <Copy
+      SourceFiles="$(TargetDir)\Archipelago.MultiClient.Net.dll;$(TargetDir)\Newtonsoft.Json.dll"
       DestinationFolder="C:\Program Files (x86)\Steam\steamapps\common\Yellow Taxi Goes Vroom\BepInEx\plugins\YellowTaxiGoesAp" />
 
     <Message Text="Copied build files" Importance="High" />
