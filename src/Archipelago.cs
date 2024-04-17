@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 using Archipelago.MultiClient.Net;
 using Archipelago.MultiClient.Net.Enums;
+using Archipelago.MultiClient.Net.Models;
 using Archipelago.MultiClient.Net.Packets;
 using I2.Loc;
 
@@ -20,6 +21,8 @@ public class Archipelago
 
     static ArchipelagoSession session;
 
+    public static int GearsReceived = 0;
+
     static string Key(string name) => $"{Data.gameDataIndex}_mod_ap_{name}";
 
     public static void OnGameStart()
@@ -33,6 +36,8 @@ public class Archipelago
         {
             OnGameEnd();
         }
+
+        GearsReceived = 0;
 
         Plugin.logger.LogInfo("Trying to connect to AP!");
 
@@ -73,16 +78,18 @@ public class Archipelago
 
         Plugin.logger.LogInfo($"Connected to AP!");
 
-        session.Items.ItemReceived += (receivedItemsHelper) =>
+        session.Items.ItemReceived += (items) =>
         {
-            var item = receivedItemsHelper.DequeueItem();
-            var itemName = receivedItemsHelper.GetItemName(item.Item);
+            var item = items.DequeueItem();
+            var itemName = items.GetItemName(item.Item);
 
             switch (itemName)
             {
                 case "Gear":
                     {
-                        Data.gearsUnlockedNumber[Data.gameDataIndex] += 1;
+                        Interlocked.Increment(ref GearsReceived);
+                        Interlocked.Increment(ref Data.gearsUnlockedNumber[Data.gameDataIndex]);
+                        Plugin.logger.LogWarning($"Num gears: `{GearsReceived}`");
                         break;
                     }
                 default:
@@ -137,6 +144,11 @@ public class Archipelago
 
     public static void OnGearCollected(MapAreaScriptableObject mapArea, int gearArrayIndex)
     {
+        if (session == null)
+        {
+            return;
+        }
+
         string location = ArchipelagoGearLocation(mapArea, gearArrayIndex);
 
         OnLocationCollected(location);
@@ -192,6 +204,11 @@ public class Archipelago
 
     public static void OnGrandmaBeaten()
     {
+        if (session == null)
+        {
+            return;
+        }
+
         var statusUpdatePacket = new StatusUpdatePacket();
         statusUpdatePacket.Status = ArchipelagoClientState.ClientGoal;
         session.Socket.SendPacket(statusUpdatePacket);
@@ -199,6 +216,11 @@ public class Archipelago
 
     public static void SendSaveDataItems()
     {
+        if (session == null)
+        {
+            return;
+        }
+
         if (Data.finalBossDefeated[Data.gameDataIndex])
         {
             OnGrandmaBeaten();
@@ -221,6 +243,16 @@ public class Archipelago
                 }
             }
         }
+    }
+
+    public static void FixGameState()
+    {
+        if (session == null)
+        {
+            return;
+        }
+
+        Data.gearsUnlockedNumber[Data.gameDataIndex] = GearsReceived;
     }
 }
 

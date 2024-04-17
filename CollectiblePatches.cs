@@ -65,3 +65,33 @@ public class GrandmaOnFinalBlowPatch
         Archipelago.OnGrandmaBeaten();
     }
 }
+
+[HarmonyPatch(typeof(Data))]
+[HarmonyPatch(nameof(Data.SaveGame))]
+public class SaveGamePatch
+{
+    static void Postfix()
+    {
+        Plugin.logger.LogWarning("Save game data called!");
+
+        if (Archipelago.Enabled)
+        {
+            Archipelago.FixGameState();
+        }
+    }
+}
+
+[HarmonyPatch(typeof(Data))]
+[HarmonyPatch(nameof(Data.LoadGame))]
+public class LoadGamePatch
+{
+    static void Postfix()
+    {
+        Plugin.logger.LogWarning("Load game data called!");
+
+        if (Archipelago.Enabled)
+        {
+            Archipelago.FixGameState();
+        }
+    }
+}
