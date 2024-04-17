@@ -138,6 +138,7 @@ public class MenuSelectionPatch
         else if (menuIndex == 4 && voiceIndex == 0)
         {
             Archipelago.OnGameStart();
+            return false;
         }
         else if (menuIndex == 17 && voiceIndex == 0)
         {

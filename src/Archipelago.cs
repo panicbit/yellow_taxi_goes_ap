@@ -1,8 +1,10 @@
 using System;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using Archipelago.MultiClient.Net;
 using Archipelago.MultiClient.Net.Enums;
+using Archipelago.MultiClient.Net.Helpers;
 using Archipelago.MultiClient.Net.Models;
 using Archipelago.MultiClient.Net.Packets;
 using I2.Loc;
@@ -43,24 +45,89 @@ public class Archipelago
 
         session = ArchipelagoSessionFactory.CreateSession(Host);
 
-        var loginResult = session.TryConnectAndLogin(
-            game: GAME,
-            name: Slot,
-            itemsHandlingFlags: ItemsHandlingFlags.IncludeOwnItems
-        // version: new Version("0.4.4"),
-        // tags: [
-        //     // "AP",
-        //     // "DeathLink",
-        //     // "Tracker",
-        //     // "TextOnly",
-        // ],
-        // uuid: null,
-        // password: Password,
-        // requestSlotData: false
+        Plugin.logger.LogWarning($"thread outside: {System.Threading.Thread.CurrentThread.ManagedThreadId}");
+
+        _ = ConnectSetupAndLogin();
+    }
+
+    async static Task ConnectSetupAndLogin()
+    {
+        Plugin.logger.LogWarning($"thread inside: {System.Threading.Thread.CurrentThread.ManagedThreadId}");
+
+        MenuV2PopupScript.SpawnNew(
+            _title: "Archipelago",
+            _text: "Connecting...",
+            _prompt: "",
+            canSelfClose: false,
+            isQuestion: false
         );
+
+        RoomInfoPacket roomInfo;
+
+        try
+        {
+            roomInfo = await session.ConnectAsync();
+        }
+        catch (Exception e)
+        {
+            Plugin.logger.LogError($"Failed to connect to AP: {e}");
+
+            MenuV2PopupScript.SpawnNew(
+                _title: "Archipelago",
+                _text: "Failed to connect!",
+                _prompt: "",
+                canSelfClose: true,
+                isQuestion: false
+            );
+
+            OnGameEnd();
+            return;
+        }
+
+        session.Items.ItemReceived += OnItemReceived;
+
+        LoginResult loginResult;
+
+        try
+        {
+            loginResult = await session.LoginAsync(
+                game: GAME,
+                name: Slot,
+                itemsHandlingFlags: ItemsHandlingFlags.IncludeOwnItems
+            );
+
+            // version: new Version("0.4.4"),
+            // tags: [
+            //     // "AP",
+            //     // "DeathLink",
+            //     // "Tracker",
+            //     // "TextOnly",
+            // ],
+            // uuid: null,
+            // password: Password,
+            // requestSlotData: false
+            // );
+        }
+        catch (Exception e)
+        {
+            Plugin.logger.LogError($"Failed login to AP: {e}");
+
+            MenuV2PopupScript.SpawnNew(
+                _title: "Archipelago",
+                _text: "Login failed!",
+                _prompt: "",
+                canSelfClose: true,
+                isQuestion: false
+            );
+
+            OnGameEnd();
+            return;
+        }
 
         if (loginResult is LoginFailure loginFailure)
         {
+            Plugin.logger.LogError($"Failed login to AP:");
+
             foreach (var error in loginFailure.Errors)
             {
                 Plugin.logger.LogError(error);
@@ -71,34 +138,21 @@ public class Archipelago
                 Plugin.logger.LogError(error);
             }
 
-            Plugin.logger.LogError($"Failed to connect to AP!");
+            MenuV2PopupScript.SpawnNew(
+                _title: "Archipelago",
+                _text: "Login failed!",
+                _prompt: "",
+                canSelfClose: true
+            );
 
             OnGameEnd();
+            return;
         }
 
         Plugin.logger.LogInfo($"Connected to AP!");
 
-        session.Items.ItemReceived += (items) =>
-        {
-            var item = items.DequeueItem();
-            var itemName = items.GetItemName(item.Item);
-
-            switch (itemName)
-            {
-                case "Gear":
-                    {
-                        Interlocked.Increment(ref GearsReceived);
-                        Interlocked.Increment(ref Data.gearsUnlockedNumber[Data.gameDataIndex]);
-                        Plugin.logger.LogWarning($"Num gears: `{GearsReceived}`");
-                        break;
-                    }
-                default:
-                    {
-                        Plugin.logger.LogError($"Received unknown item: `{itemName}`");
-                        break;
-                    }
-            }
-        };
+        MenuV2PopupScript.instance?.Close();
+        MenuV2Script.instance.GotoStoryScene("SoundMenuPlayModeSelect");
 
         SendSaveDataItems();
     }
@@ -114,7 +168,7 @@ public class Archipelago
 
         try
         {
-            session?.Socket?.DisconnectAsync().Wait(5000);
+            session?.Socket?.DisconnectAsync();
         }
         catch (Exception e)
         {
@@ -142,6 +196,28 @@ public class Archipelago
         Port = DataEncryptionMasterExt.GetInt(Key("port"), 0);
         Slot = DataEncryptionMasterExt.GetString(Key("slot"), "");
         Password = DataEncryptionMasterExt.GetString(Key("password"), "");
+    }
+
+    public static void OnItemReceived(ReceivedItemsHelper items)
+    {
+        var item = items.DequeueItem();
+        var itemName = items.GetItemName(item.Item);
+
+        switch (itemName)
+        {
+            case "Gear":
+                {
+                    Interlocked.Increment(ref GearsReceived);
+                    Interlocked.Increment(ref Data.gearsUnlockedNumber[Data.gameDataIndex]);
+                    Plugin.logger.LogWarning($"Num gears: `{GearsReceived}`");
+                    break;
+                }
+            default:
+                {
+                    Plugin.logger.LogError($"Received unknown item: `{itemName}`");
+                    break;
+                }
+        }
     }
 
     public static void OnGearCollected(MapAreaScriptableObject mapArea, int gearArrayIndex)
