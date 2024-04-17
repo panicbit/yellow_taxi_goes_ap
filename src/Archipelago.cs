@@ -3,6 +3,8 @@ using System.Linq;
 using System.Threading;
 using Archipelago.MultiClient.Net;
 using Archipelago.MultiClient.Net.Enums;
+using Archipelago.MultiClient.Net.Packets;
+using I2.Loc;
 
 namespace yellow_taxi_goes_ap;
 
@@ -63,17 +65,35 @@ public class Archipelago
             {
                 Plugin.logger.LogError(error);
             }
+
+            Plugin.logger.LogError($"Failed to connect to AP!");
+
+            OnGameEnd();
         }
 
-        if (loginResult.Successful)
+        Plugin.logger.LogInfo($"Connected to AP!");
+
+        session.Items.ItemReceived += (receivedItemsHelper) =>
         {
-            Plugin.logger.LogInfo($"Connected to AP!");
-        }
-        else
-        {
-            Plugin.logger.LogError($"Failed to connect to AP!");
-            session = null;
-        }
+            var item = receivedItemsHelper.DequeueItem();
+            var itemName = receivedItemsHelper.GetItemName(item.Item);
+
+            switch (itemName)
+            {
+                case "Gear":
+                    {
+                        Data.gearsUnlockedNumber[Data.gameDataIndex] += 1;
+                        break;
+                    }
+                default:
+                    {
+                        Plugin.logger.LogError($"Received unknown item: `{itemName}`");
+                        break;
+                    }
+            }
+        };
+
+        SendSaveDataItems();
     }
 
     public static void OnGameEnd()
@@ -115,6 +135,41 @@ public class Archipelago
         Password = DataEncryptionMasterExt.GetString(Key("password"), "");
     }
 
+    public static void OnGearCollected(MapAreaScriptableObject mapArea, int gearArrayIndex)
+    {
+        string location = ArchipelagoGearLocation(mapArea, gearArrayIndex);
+
+        OnLocationCollected(location);
+    }
+
+    static string ArchipelagoGearLocation(MapAreaScriptableObject mapArea, int gearArrayIndex)
+    {
+        try
+        {
+            Plugin.logger.LogInfo($"gear array index: {gearArrayIndex}");
+
+            var apGearIndex = mapArea.gearsId.AsEnumerable()
+                .OrderBy(arrayIndex => arrayIndex)
+                .Select((arrayIndex, apIndex) => (arrayIndex, apIndex))
+                .First((gear) => gear.arrayIndex == gearArrayIndex)
+                .apIndex;
+
+            Plugin.logger.LogInfo($"YTGV {gearArrayIndex} -> AP {apGearIndex}");
+
+            var localAreaName = LocalizationManager.GetTranslation(mapArea.areaName, overrideLanguage: "English");
+            var location = $"{localAreaName} | Gear {apGearIndex + 1}";
+
+            Plugin.logger.LogWarning($"Got gear: `{location}`");
+
+            return location;
+        }
+        catch (Exception e)
+        {
+            Plugin.logger.LogError($"Collectible error: {e}");
+
+            return "";
+        }
+    }
     public static void OnLocationCollected(string name)
     {
         if (session == null)
@@ -124,13 +179,47 @@ public class Archipelago
 
         try
         {
+            Plugin.logger.LogInfo($"Trying to send check `{name}` to AP");
             var locationId = session.Locations.GetLocationIdFromName(GAME, name);
 
             session.Locations.CompleteLocationChecks(locationId);
         }
         catch (Exception e)
         {
-            Plugin.logger.LogError($"Failed to send check to AP: {e}");
+            Plugin.logger.LogError($"Failed to send check `{name}` to AP: {e}");
+        }
+    }
+
+    public static void OnGrandmaBeaten()
+    {
+        var statusUpdatePacket = new StatusUpdatePacket();
+        statusUpdatePacket.Status = ArchipelagoClientState.ClientGoal;
+        session.Socket.SendPacket(statusUpdatePacket);
+    }
+
+    public static void SendSaveDataItems()
+    {
+        if (Data.finalBossDefeated[Data.gameDataIndex])
+        {
+            OnGrandmaBeaten();
+        }
+
+        foreach (var mapArea in MapMaster.instance.mapAreasList)
+        {
+            // Gears
+            foreach (var gearArrayIndex in mapArea.gearsId)
+            {
+                var isCollected = Data.GearStateGet(
+                    (int)mapArea.levelId,
+                    gearArrayIndex / 32,
+                    gearArrayIndex % 32
+                );
+
+                if (isCollected)
+                {
+                    OnGearCollected(mapArea, gearArrayIndex);
+                }
+            }
         }
     }
 }

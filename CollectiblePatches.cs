@@ -1,44 +1,67 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using HarmonyLib;
 using I2.Loc;
+using UnityEngine;
+using UnityEngine.Bindings;
 
 namespace yellow_taxi_goes_ap;
 
-[HarmonyPatch(typeof(ModMaster))]
-[HarmonyPatch(nameof(ModMaster.OnPlayerOnGearCollect))]
-public class OnPlayerOnGearCollectPatch
+[HarmonyPatch(typeof(PlayerScript))]
+[HarmonyPatch(nameof(PlayerScript.OnTriggerStay))]
+public class OnPlayerOnTriggerStayPatch
 {
-    static void Prefix(bool alreadyTaken)
+    static void Prefix(Collider other)
     {
-        try
+        if (!Tick.IsGameRunning || !Archipelago.Enabled)
         {
-            var mapArea = MapArea.instancePlayerInside;
-            var levelId = GameplayMaster.instance.levelId;
-            var bonusScript = PlayerScript.instance.GetPrivateField<BonusScript>("bonusScr");
-
-            Plugin.logger.LogInfo($"gear array index: {bonusScript.gearArrayIndex}");
-
-            var apGearIndex = mapArea.gearsId.AsEnumerable()
-                .OrderBy(arrayIndex => arrayIndex)
-                .Select((arrayIndex, apIndex) => (arrayIndex, apIndex))
-                .First((gear) => gear.arrayIndex == bonusScript.gearArrayIndex)
-                .apIndex;
-
-            Plugin.logger.LogInfo($"YTGV {bonusScript.gearArrayIndex} -> AP {apGearIndex}");
-
-            var localAreaName = LocalizationManager.GetTranslation(mapArea.areaNameKey, overrideLanguage: "English");
-            var location = $"{localAreaName} | Gear {apGearIndex + 1}";
-
-            Plugin.logger.LogWarning($"Got gear: `{location}`{(alreadyTaken ? " (already taken)" : "")}");
-
-            Archipelago.OnLocationCollected(location);
+            return;
         }
-        catch (Exception e)
+
+        var bonusScript = other.GetComponent<BonusScript>(); ;
+
+        if (bonusScript == null)
         {
-            Plugin.logger.LogError($"Collectible error: {e}");
+            return;
+        }
+
+        // On gear collect
+        if (bonusScript.myIdentity == BonusScript.Identity.gear && GameplayMaster.instance.levelId >= Data.LevelId.Hub)
+        {
+            Plugin.logger.LogWarning($"Trying to collect gear");
+
+            bool alreadyTaken = Data.GearStateGet(
+                (int)GameplayMaster.instance.levelId,
+                bonusScript.gearArrayIndex / 32,
+                bonusScript.gearArrayIndex % 32
+            );
+
+            Plugin.logger.LogWarning($"Gear already taken: {alreadyTaken}");
+
+            if (!alreadyTaken)
+            {
+                Data.GearStateSet(
+                    (int)GameplayMaster.instance.levelId,
+                    bonusScript.gearArrayIndex / 32,
+                    bonusScript.gearArrayIndex % 32,
+                    true
+                );
+
+                var mapArea = MapArea.instancePlayerInside;
+                var mapAreaObject = MapMaster.GetAreaScriptableObject_ByAreaName(mapArea.areaNameKey);
+
+                Archipelago.OnGearCollected(mapAreaObject, bonusScript.gearArrayIndex);
+            }
         }
     }
 }
 
+[HarmonyPatch(typeof(GrandmaFinalBoss))]
+[HarmonyPatch("OnFinalBlow")]
+public class GrandmaOnFinalBlowPatch
+{
+    static void Prefix()
+    {
+        Archipelago.OnGrandmaBeaten();
+    }
+}
