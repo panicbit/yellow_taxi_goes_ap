@@ -120,8 +120,10 @@ public class Archipelago
         {
             Plugin.logger.LogError($"Failed to disconnect from AP: {e}");
         }
-
-        session = null;
+        finally
+        {
+            session = null;
+        }
     }
 
     public static void SaveSettings()
