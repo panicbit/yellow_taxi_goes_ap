@@ -35,6 +35,11 @@ public class OnPlayerOnTriggerStayPatch
         // On gear collect
         if (bonusScript.myIdentity == BonusScript.Identity.gear && GameplayMaster.instance.levelId >= Data.LevelId.Hub)
         {
+            if (GameplayMaster.instance.timeAttackLevel)
+            {
+                return;
+            }
+
             Plugin.logger.LogWarning($"Trying to collect gear");
 
             bool alreadyTaken = Data.GearStateGet(
