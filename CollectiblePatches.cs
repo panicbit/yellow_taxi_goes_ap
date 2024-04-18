@@ -62,9 +62,24 @@ public class OnPlayerOnTriggerStayPatch
                 var mapArea = MapArea.instancePlayerInside;
                 var mapAreaObject = MapMaster.GetAreaScriptableObject_ByAreaName(mapArea.areaNameKey);
 
+                // Update portals
+                for (int i = 0; i < PortalScript.list.Count; i++)
+                {
+                    if (!(PortalScript.list[i] == null))
+                    {
+                        PortalScript.list[i].CostUpdateTry();
+                        PortalScript.list[i].UpdatePortalToLevelName();
+                    }
+                }
+
+                Data.SaveGame(false);
+
+                GameplayMaster.instance.UpdateLevelCollectedGearsNumber();
+
                 Archipelago.OnGearCollected(mapAreaObject, bonusScript.gearArrayIndex);
             }
         }
+
     }
 }
 

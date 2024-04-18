@@ -209,6 +209,17 @@ public class Archipelago
                 {
                     Interlocked.Increment(ref GearsReceived);
                     Interlocked.Increment(ref Data.gearsUnlockedNumber[Data.gameDataIndex]);
+
+                    // Update portals
+                    for (int i = 0; i < PortalScript.list.Count; i++)
+                    {
+                        if (!(PortalScript.list[i] == null))
+                        {
+                            PortalScript.list[i].CostUpdateTry();
+                            PortalScript.list[i].UpdatePortalToLevelName();
+                        }
+                    }
+
                     Plugin.logger.LogWarning($"Num gears: `{GearsReceived}`");
                     break;
                 }
