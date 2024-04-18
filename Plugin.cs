@@ -16,7 +16,6 @@ public class Plugin : BaseUnityPlugin
 
     public Harmony harmony;
 
-
     private void Awake()
     {
         instance = this;

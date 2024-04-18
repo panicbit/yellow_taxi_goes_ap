@@ -16,6 +16,7 @@
     <PackageReference Include="UnityEngine.Modules" Version="2020.3.48" IncludeAssets="compile" />
     <PackageReference Include="Archipelago.MultiClient.Net" Version="5.0.6"
       GeneratePathProperty="true" IncludeAssets="None" ExcludeAssets="All" PrivateAssets="None" />
+    <PackageReference Include="SharpGLTF.Core" Version="1.0.0-alpha0031" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework.TrimEnd(`0123456789`))' == 'net'">
@@ -39,14 +40,10 @@
     <Message Text="Executing CopyDLLs task" Importance="High" />
 
     <ItemGroup>
-      <MySourceFiles Include="$(TargetDir)$(ProjectName).dll;$(TargetDir)$(ProjectName).pdb" />
+      <MySourceFiles Include="$(TargetDir)*.dll;$(TargetDir)$(ProjectName).pdb" />
     </ItemGroup>
 
     <Copy SourceFiles="@(MySourceFiles)"
-      DestinationFolder="C:\Program Files (x86)\Steam\steamapps\common\Yellow Taxi Goes Vroom\BepInEx\plugins\YellowTaxiGoesAp" />
-
-    <Copy
-      SourceFiles="$(TargetDir)\Archipelago.MultiClient.Net.dll;$(TargetDir)\Newtonsoft.Json.dll"
       DestinationFolder="C:\Program Files (x86)\Steam\steamapps\common\Yellow Taxi Goes Vroom\BepInEx\plugins\YellowTaxiGoesAp" />
 
     <Message Text="Copied build files" Importance="High" />
