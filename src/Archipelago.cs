@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -72,6 +73,8 @@ public class Archipelago
         {
             Plugin.logger.LogError($"Failed to connect to AP: {e}");
 
+            OnGameEnd();
+
             MenuV2PopupScript.SpawnNew(
                 _title: "Archipelago",
                 _text: "Failed to connect!",
@@ -80,7 +83,6 @@ public class Archipelago
                 isQuestion: false
             );
 
-            OnGameEnd();
             return;
         }
 
@@ -124,7 +126,11 @@ public class Archipelago
             return;
         }
 
-        if (loginResult is LoginFailure loginFailure)
+        if (loginResult is LoginSuccessful login)
+        {
+            Plugin.logger.LogInfo($"Connected to AP!");
+        }
+        else if (loginResult is LoginFailure loginFailure)
         {
             Plugin.logger.LogError($"Failed login to AP:");
 
@@ -148,8 +154,25 @@ public class Archipelago
             OnGameEnd();
             return;
         }
+        else
+        {
+            Plugin.logger.LogError("Unknown login result");
 
-        Plugin.logger.LogInfo($"Connected to AP!");
+            OnGameEnd();
+            return;
+        }
+
+        try
+        {
+            SetLevelCostsFromSlotData(login.SlotData);
+        }
+        catch (Exception e)
+        {
+            Plugin.logger.LogError($"Failed to set level costs from slot data: {e}");
+
+            OnGameEnd();
+            return;
+        }
 
         MenuV2PopupScript.instance?.Close();
         MenuV2Script.instance.GotoStoryScene("SoundMenuPlayModeSelect");
@@ -164,6 +187,8 @@ public class Archipelago
             return;
         }
 
+        MenuV2PopupScript.instance?.Close();
+
         Plugin.logger.LogInfo("Disconnecting from AP!");
 
         try
@@ -177,6 +202,7 @@ public class Archipelago
         finally
         {
             session = null;
+            RestoreLevelCosts();
         }
     }
 
@@ -203,22 +229,14 @@ public class Archipelago
         var item = items.DequeueItem();
         var itemName = items.GetItemName(item.Item);
 
+        Plugin.logger.LogWarning($"!!!! on item received !!!");
+
         switch (itemName)
         {
             case "Gear":
                 {
                     Interlocked.Increment(ref GearsReceived);
                     Interlocked.Increment(ref Data.gearsUnlockedNumber[Data.gameDataIndex]);
-
-                    // Update portals
-                    for (int i = 0; i < PortalScript.list.Count; i++)
-                    {
-                        if (!(PortalScript.list[i] == null))
-                        {
-                            PortalScript.list[i].CostUpdateTry();
-                            PortalScript.list[i].UpdatePortalToLevelName();
-                        }
-                    }
 
                     Plugin.logger.LogWarning($"Num gears: `{GearsReceived}`");
                     break;
@@ -334,14 +352,103 @@ public class Archipelago
         }
     }
 
-    public static void FixGameState()
+    public static void SetLevelCostsFromSlotData(Dictionary<string, object> slotData)
+    {
+        Plugin.logger.LogInfo("Setting level costs from slot data");
+
+        var obj = slotData["bombeach_required_gears"];
+        Plugin.logger.LogWarning($"Obj is: `{obj}`, type: `{obj.GetType()}`");
+
+
+        var getInt = (string key) =>
+        {
+            try
+            {
+                return (int)(Int64)slotData[key];
+            }
+            catch (Exception e)
+            {
+                Plugin.logger.LogError($"Failed to get `{key}` from slot data: {e}");
+
+                throw e;
+            }
+        };
+
+        foreach (var level in Data.levelDataList)
+        {
+            ref var cost = ref level.levelCost;
+
+            switch (level.levelName)
+            {
+                case "LEVEL_NAME_MORIOS_HOME": cost = getInt("morios_island_required_gears"); break;
+                case "LEVEL_NAME_BOMBEACH": cost = getInt("bombeach_required_gears"); break;
+                case "LEVEL_NAME_ARCADE_PANIK": cost = getInt("arcade_plaza_required_gears"); break;
+                case "LEVEL_NAME_PIZZA_TIME": cost = getInt("pizza_time_required_gears"); break;
+                case "LEVEL_NAME_TOSLA_OFFICES": cost = getInt("tosla_square_required_gears"); break;
+                case "LEVEL_NAME_CITY": cost = getInt("maurizios_city_required_gears"); break;
+                case "LEVEL_NAME_CRASH_TEST_INDUSTRIES": cost = getInt("crash_test_industries_required_gears"); break;
+                case "LEVEL_NAME_MORIOS_MIND": cost = getInt("morios_mind_required_gears"); break;
+                case "LEVEL_NAME_STARMAN_CASTLE": cost = getInt("observing_required_gears"); break;
+                case "LEVEL_NAME_TOSLA_HQ": cost = getInt("anticipation_required_gears"); break;
+            }
+        }
+    }
+
+    public static void RestoreLevelCosts()
+    {
+        Plugin.logger.LogInfo("Restoring level costs");
+
+        foreach (var level in Data.levelDataList)
+        {
+            ref var cost = ref level.levelCost;
+
+            switch (level.levelName)
+            {
+                case "LEVEL_NAME_MORIOS_HOME": cost = 3; break;
+                case "LEVEL_NAME_BOMBEACH": cost = 6; break;
+                case "LEVEL_NAME_ARCADE_PANIK": cost = 18; break;
+                case "LEVEL_NAME_PIZZA_TIME": cost = 32; break;
+                case "LEVEL_NAME_TOSLA_OFFICES": cost = 50; break;
+                case "LEVEL_NAME_CITY": cost = 65; break;
+                case "LEVEL_NAME_CRASH_TEST_INDUSTRIES": cost = 80; break;
+                case "LEVEL_NAME_MORIOS_MIND": cost = 0; break;
+                case "LEVEL_NAME_STARMAN_CASTLE": cost = 0; break;
+                case "LEVEL_NAME_TOSLA_HQ": cost = 130; break;
+            }
+        }
+    }
+
+    public static void RefreshGameState()
     {
         if (session == null)
         {
             return;
         }
 
+        if (GameplayMaster.instance == null)
+        {
+            return;
+        }
+
+        // Plugin.logger.LogWarning($"Gears received: {GearsReceived}");
         Data.gearsUnlockedNumber[Data.gameDataIndex] = GearsReceived;
+
+        // // Update portals
+        // for (int i = 0; i < PortalScript.list.Count; i++)
+        // {
+        //     if (!(PortalScript.list[i] == null))
+        //     {
+        //         PortalScript.list[i].CostUpdateTry();
+        //         PortalScript.list[i].UpdatePortalToLevelName();
+        //     }
+        // }
+
+        if (GameplayMaster.instance.timeAttackLevel)
+        {
+            GameplayMaster.instance.UpdateLevelCollectedGearsNumber();
+        }
+
+        // Plugin.logger.LogWarning($"Gears unlocked after all the updating: {Data.gearsUnlockedNumber[Data.gameDataIndex]}");
     }
 }
 

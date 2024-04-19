@@ -270,7 +270,7 @@ public class MenuBackPatch
             menuIndex = MenuV2Script.indexSettings;
             voiceIndex = MenuVoicesInitPatch.indexArchipelagoVoice;
             Sound.Play_Unpausable("SoundMenuBack", 1f, 1f);
-            Data.SaveGame();
+            Data.SaveGame(forceSave: true);
             return false;
         }
 

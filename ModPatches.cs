@@ -21,5 +21,6 @@ public class ModMasterUpdatePatch
 {
     static void Prefix()
     {
+        Archipelago.RefreshGameState();
     }
 }
