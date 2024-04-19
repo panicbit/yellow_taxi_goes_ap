@@ -44,7 +44,7 @@ public class Archipelago
 
         Plugin.logger.LogInfo("Trying to connect to AP!");
 
-        session = ArchipelagoSessionFactory.CreateSession(Host);
+        session = ArchipelagoSessionFactory.CreateSession(Host, Port);
 
         Plugin.logger.LogWarning($"thread outside: {System.Threading.Thread.CurrentThread.ManagedThreadId}");
 
