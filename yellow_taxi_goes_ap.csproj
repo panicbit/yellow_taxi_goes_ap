@@ -20,8 +20,7 @@
     </PackageReference>
     <PackageReference Include="UnityEngine.Modules" Version="2020.3.48" IncludeAssets="compile" />
     <PackageReference Include="Archipelago.MultiClient.Net" Version="5.0.6" />
-    <!-- GeneratePathProperty="true" IncludeAssets="None" ExcludeAssets="All" PrivateAssets="None" -->
-    <!-- <PackageReference Include="SharpGLTF.Core" Version="1.0.0-alpha0031" /> -->
+    <PackageReference Include="SharpGLTF.Core" Version="1.0.0-alpha0031" />
   </ItemGroup>
 
   <!-- <ItemGroup Condition="'$(TargetFramework.TrimEnd(`0123456789`))' == 'net'">
