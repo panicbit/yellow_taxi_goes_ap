@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net47</TargetFramework>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <AssemblyName>yellow_taxi_goes_ap</AssemblyName>
     <Description>Archipelago support for "Yellow Taxi Goes Vroom"</Description>
     <Version>1.0.0</Version>
@@ -13,16 +13,20 @@
     <PackageReference Include="BepInEx.Analyzers" Version="1.*" PrivateAssets="all" />
     <PackageReference Include="BepInEx.Core" Version="5.*" />
     <PackageReference Include="BepInEx.PluginInfoProps" Version="1.*" />
+    <PackageReference Include="PolySharp" Version="1.14.1">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
     <PackageReference Include="UnityEngine.Modules" Version="2020.3.48" IncludeAssets="compile" />
-    <PackageReference Include="Archipelago.MultiClient.Net" Version="5.0.6"
-      GeneratePathProperty="true" IncludeAssets="None" ExcludeAssets="All" PrivateAssets="None" />
-    <PackageReference Include="SharpGLTF.Core" Version="1.0.0-alpha0031" />
+    <PackageReference Include="Archipelago.MultiClient.Net" Version="5.0.6" />
+    <!-- GeneratePathProperty="true" IncludeAssets="None" ExcludeAssets="All" PrivateAssets="None" -->
+    <!-- <PackageReference Include="SharpGLTF.Core" Version="1.0.0-alpha0031" /> -->
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework.TrimEnd(`0123456789`))' == 'net'">
+  <!-- <ItemGroup Condition="'$(TargetFramework.TrimEnd(`0123456789`))' == 'net'">
     <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.2"
       PrivateAssets="all" />
-  </ItemGroup>
+  </ItemGroup> -->
 
   <ItemGroup>
     <Reference Include="Assembly-CSharp">
@@ -31,9 +35,10 @@
     <Reference Include="Unity.TextMeshPro">
       <HintPath>lib\Unity.TextMeshPro.dll</HintPath>
     </Reference>
-    <Reference
-      Include="$(PkgArchipelago_MultiClient_Net)\lib\netstandard2.0\Archipelago.MultiClient.Net.dll" />
-    <Reference Include="$(PkgArchipelago_MultiClient_Net)\lib\netstandard2.0\Newtonsoft.Json.dll" />
+    <!-- <Reference
+    Include="$(PkgArchipelago_MultiClient_Net)\lib\netstandard2.0\Archipelago.MultiClient.Net.dll"
+    />
+    <Reference Include="$(PkgArchipelago_MultiClient_Net)\lib\netstandard2.0\Newtonsoft.Json.dll" /> -->
   </ItemGroup>
 
   <Target Name="CopyDLLs" AfterTargets="Build">

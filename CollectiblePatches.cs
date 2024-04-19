@@ -6,7 +6,7 @@ using System.Linq;
 using Extensions.Enum;
 using HarmonyLib;
 using I2.Loc;
-using SharpGLTF.Schema2;
+// using SharpGLTF.Schema2;
 using UnityEngine;
 using UnityEngine.Bindings;
 using UnityEngine.Rendering;
@@ -118,141 +118,151 @@ public class LoadGamePatch
 
         if (Archipelago.Enabled)
         {
-            Archipelago.FixGameState();
+            Archipelago.RefreshGameState();
         }
     }
 }
 
-[HarmonyPatch(typeof(BonusScript))]
-[HarmonyPatch(nameof(BonusScript.Awake))]
-public class VisualsPatch
+[HarmonyPatch(typeof(Data))]
+[HarmonyPatch("CreateLevelData")]
+public class CreateLevelDataPatch
 {
-
-    static void Postfix(BonusScript __instance)
+    static void Postfix()
     {
-        // TODO: replace gear mesh only if location has AP item
-        return;
-
-        if (!Archipelago.Enabled)
-        {
-            return;
-        }
-
-        if (__instance.myIdentity != BonusScript.Identity.gear)
-        {
-            return;
-        }
-
-        try
-        {
-            var meshFilter = __instance.myMeshFilter;
-            var pluginRoot = Path.GetDirectoryName(Plugin.instance.Info.Location);
-
-            // TODO: Move outside of `Awake` method
-            var modelRoot = ModelRoot.Load(Path.Combine(pluginRoot, "archipelago.gltf"));
-
-            {
-                var (mesh, position, scale, rotation) = gltfModelToMesh(modelRoot, "AP Logo");
-                meshFilter.transform.localPosition = position;
-                meshFilter.transform.localScale = scale;
-                meshFilter.transform.localRotation = rotation;
-                meshFilter.mesh = mesh;
-            }
-
-            {
-                var (mesh, position, scale, rotation) = gltfModelToMesh(modelRoot, "AP Logo Outline");
-                var outlineMeshFilter = __instance.gearOutlineTr.gameObject.GetComponentInChildren<MeshFilter>();
-                outlineMeshFilter.transform.localPosition = position;
-                outlineMeshFilter.transform.localScale = scale;
-                outlineMeshFilter.transform.localRotation = rotation;
-                outlineMeshFilter.mesh = mesh;
-            }
-        }
-        catch (Exception e)
-        {
-            Plugin.logger.LogError($"Failed to patch visuals: {e}");
-        }
-    }
-
-    public static (UnityEngine.Mesh, Vector3, Vector3, Quaternion) gltfModelToMesh(ModelRoot root, string name, bool inverted = false)
-    {
-        var node = root.LogicalNodes.First((node) => node.Name == name);
-        var gltfMesh = root.LogicalMeshes.First((mesh) => mesh.Name == name);
-
-        var allVertices = new List<Vector3>();
-        var allTriangles = new List<int>();
-
-        Plugin.logger.LogWarning("======= vertice lengths");
-        foreach (var primitive in gltfMesh.Primitives)
-        {
-            var triangles = primitive.GetTriangleIndices()
-                .SelectMany((triangle) => new int[] {
-                        allVertices.Count + triangle.A,
-                        allVertices.Count + triangle.B,
-                        allVertices.Count + triangle.C,
-                });
-
-            allTriangles.AddRange(triangles);
-
-            var vertices = primitive
-                .GetVertices("POSITION").AsVector3Array()
-                .Select((v) => new Vector3(v.X, v.Y, v.Z));
-
-            // var uv = primitive.GetVertices("TEXCOORD_0").AsVector2Array()
-            //     .Select((v) => new Vector2(v.X, v.Y))
-            //     .ToArray();
-            allVertices.AddRange(vertices);
-            // var normals = primitive.GetVertices("NORMAL").AsVector3Array()
-            //     .Select((v) => new Vector3(v.X, v.Y, v.Z))
-            //     .ToArray();
-        }
-
-        var mesh = new UnityEngine.Mesh();
-        // mesh.subMeshCount = gltfMesh.Primitives.Count;
-        mesh.vertices = allVertices.ToArray();
-
-        if (inverted)
-        {
-            allTriangles.Reverse();
-        }
-        mesh.triangles = allTriangles.ToArray();
-        // mesh.uv = gltfMesh.Primitives
-        //     .SelectMany((primitive) =>
-        //         primitive
-        //         .GetVertices("TEXCOORD_0").AsVector2Array()
-        //         .Select((v) => new Vector2(v.X, v.Y))
-        //     )
-        //     .ToArray();
-
-        mesh.normals = gltfMesh.Primitives
-            .SelectMany((primitive) =>
-                primitive.GetVertices("NORMAL").AsVector3Array()
-                .Select((v) => new Vector3(v.X, v.Y, v.Z))
-            )
-            .ToArray();
-
-        var position = new Vector3
-        {
-            x = node.LocalTransform.Translation.X,
-            y = node.LocalTransform.Translation.Y,
-            z = node.LocalTransform.Translation.Z,
-        };
-
-        var scale = new Vector3
-        {
-            x = node.LocalTransform.Scale.X,
-            y = node.LocalTransform.Scale.Y,
-            z = node.LocalTransform.Scale.Z,
-        };
-
-        var rotation = new Quaternion
-        {
-            x = node.LocalTransform.Rotation.X,
-            y = node.LocalTransform.Rotation.Y,
-            z = node.LocalTransform.Rotation.Z,
-            w = node.LocalTransform.Rotation.W,
-        };
-
-        return (mesh, position, scale, rotation);
+        Plugin.logger.LogError("CreateLevelData called!");
     }
 }
+
+// [HarmonyPatch(typeof(BonusScript))]
+// [HarmonyPatch(nameof(BonusScript.Awake))]
+// public class VisualsPatch
+// {
+
+//     static void Postfix(BonusScript __instance)
+//     {
+//         // TODO: replace gear mesh only if location has AP item
+//         return;
+
+//         if (!Archipelago.Enabled)
+//         {
+//             return;
+//         }
+
+//         if (__instance.myIdentity != BonusScript.Identity.gear)
+//         {
+//             return;
+//         }
+
+//         try
+//         {
+//             var meshFilter = __instance.myMeshFilter;
+//             var pluginRoot = Path.GetDirectoryName(Plugin.instance.Info.Location);
+
+//             // TODO: Move outside of `Awake` method
+//             var modelRoot = ModelRoot.Load(Path.Combine(pluginRoot, "archipelago.gltf"));
+
+//             {
+//                 var (mesh, position, scale, rotation) = gltfModelToMesh(modelRoot, "AP Logo");
+//                 meshFilter.transform.localPosition = position;
+//                 meshFilter.transform.localScale = scale;
+//                 meshFilter.transform.localRotation = rotation;
+//                 meshFilter.mesh = mesh;
+//             }
+
+//             {
+//                 var (mesh, position, scale, rotation) = gltfModelToMesh(modelRoot, "AP Logo Outline");
+//                 var outlineMeshFilter = __instance.gearOutlineTr.gameObject.GetComponentInChildren<MeshFilter>();
+//                 outlineMeshFilter.transform.localPosition = position;
+//                 outlineMeshFilter.transform.localScale = scale;
+//                 outlineMeshFilter.transform.localRotation = rotation;
+//                 outlineMeshFilter.mesh = mesh;
+//             }
+//         }
+//         catch (Exception e)
+//         {
+//             Plugin.logger.LogError($"Failed to patch visuals: {e}");
+//         }
+//     }
+
+//     public static (UnityEngine.Mesh, Vector3, Vector3, Quaternion) gltfModelToMesh(ModelRoot root, string name, bool inverted = false)
+//     {
+//         var node = root.LogicalNodes.First((node) => node.Name == name);
+//         var gltfMesh = root.LogicalMeshes.First((mesh) => mesh.Name == name);
+
+//         var allVertices = new List<Vector3>();
+//         var allTriangles = new List<int>();
+
+//         Plugin.logger.LogWarning("======= vertice lengths");
+//         foreach (var primitive in gltfMesh.Primitives)
+//         {
+//             var triangles = primitive.GetTriangleIndices()
+//                 .SelectMany((triangle) => new int[] {
+//                         allVertices.Count + triangle.A,
+//                         allVertices.Count + triangle.B,
+//                         allVertices.Count + triangle.C,
+//                 });
+
+//             allTriangles.AddRange(triangles);
+
+//             var vertices = primitive
+//                 .GetVertices("POSITION").AsVector3Array()
+//                 .Select((v) => new Vector3(v.X, v.Y, v.Z));
+
+//             // var uv = primitive.GetVertices("TEXCOORD_0").AsVector2Array()
+//             //     .Select((v) => new Vector2(v.X, v.Y))
+//             //     .ToArray();
+//             allVertices.AddRange(vertices);
+//             // var normals = primitive.GetVertices("NORMAL").AsVector3Array()
+//             //     .Select((v) => new Vector3(v.X, v.Y, v.Z))
+//             //     .ToArray();
+//         }
+
+//         var mesh = new UnityEngine.Mesh();
+//         // mesh.subMeshCount = gltfMesh.Primitives.Count;
+//         mesh.vertices = allVertices.ToArray();
+
+//         if (inverted)
+//         {
+//             allTriangles.Reverse();
+//         }
+//         mesh.triangles = allTriangles.ToArray();
+//         // mesh.uv = gltfMesh.Primitives
+//         //     .SelectMany((primitive) =>
+//         //         primitive
+//         //         .GetVertices("TEXCOORD_0").AsVector2Array()
+//         //         .Select((v) => new Vector2(v.X, v.Y))
+//         //     )
+//         //     .ToArray();
+
+//         mesh.normals = gltfMesh.Primitives
+//             .SelectMany((primitive) =>
+//                 primitive.GetVertices("NORMAL").AsVector3Array()
+//                 .Select((v) => new Vector3(v.X, v.Y, v.Z))
+//             )
+//             .ToArray();
+
+//         var position = new Vector3
+//         {
+//             x = node.LocalTransform.Translation.X,
+//             y = node.LocalTransform.Translation.Y,
+//             z = node.LocalTransform.Translation.Z,
+//         };
+
+//         var scale = new Vector3
+//         {
+//             x = node.LocalTransform.Scale.X,
+//             y = node.LocalTransform.Scale.Y,
+//             z = node.LocalTransform.Scale.Z,
+//         };
+
+//         var rotation = new Quaternion
+//         {
+//             x = node.LocalTransform.Rotation.X,
+//             y = node.LocalTransform.Rotation.Y,
+//             z = node.LocalTransform.Rotation.Z,
+//             w = node.LocalTransform.Rotation.W,
+//         };
+
+//         return (mesh, position, scale, rotation);
+//     }
+// }
