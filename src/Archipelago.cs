@@ -443,7 +443,7 @@ public class Archipelago
         //     }
         // }
 
-        if (GameplayMaster.instance.timeAttackLevel)
+        if (!GameplayMaster.instance.timeAttackLevel)
         {
             GameplayMaster.instance.UpdateLevelCollectedGearsNumber();
         }
