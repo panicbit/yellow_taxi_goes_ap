@@ -301,6 +301,11 @@ public class Archipelago
             Plugin.logger.LogInfo($"Trying to send check `{name}` to AP");
             var locationId = session.Locations.GetLocationIdFromName(GAME, name);
 
+            if (locationId == -1)
+            {
+                Plugin.logger.LogError("Location `{}` could not be resolved to an id");
+            }
+
             session.Locations.CompleteLocationChecks(locationId);
         }
         catch (Exception e)
