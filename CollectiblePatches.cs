@@ -53,22 +53,51 @@ public class OnPlayerOnTriggerStayPatch
             if (!alreadyTaken)
             {
                 Data.GearStateSet(
-                    (int)GameplayMaster.instance.levelId,
+                    (int)levelId,
                     bonusScript.gearArrayIndex / 32,
                     bonusScript.gearArrayIndex % 32,
                     true
                 );
 
-                var mapArea = MapArea.instancePlayerInside;
-                var mapAreaObject = MapMaster.GetAreaScriptableObject_ByAreaName(mapArea.areaNameKey);
-
                 Data.SaveGame();
 
-                Archipelago.OnGearCollected(mapAreaObject, bonusScript.gearArrayIndex);
+                Archipelago.OnGearCollected(levelId, bonusScript.gearArrayIndex);
             }
         }
     }
 }
+
+[HarmonyPatch(typeof(PersonScenziatoV2))]
+[HarmonyPatch(nameof(PersonScenziatoV2.Awake))]
+public class MorioAwakePatch
+{
+    static void Postfix(PersonScenziatoV2 __instance)
+    {
+        var moriosGearCollected = Data.GearStateGetAbsolute((int)Data.LevelId.Hub, 0);
+
+        if (!moriosGearCollected)
+        {
+            __instance.instantDialogueInsideRing = true;
+        }
+    }
+}
+
+[HarmonyPatch(typeof(PersonScenziatoV2))]
+[HarmonyPatch("ChooseDialogue")]
+public class MorioDialoguePatch
+{
+    static void Postfix(PersonScenziatoV2 __instance)
+    {
+        var moriosGearCollected = Data.GearStateGetAbsolute((int)Data.LevelId.Hub, 0);
+
+        if (!moriosGearCollected)
+        {
+            __instance.instantDialogueInsideRing = true;
+            __instance.dialoguePickup = __instance.dialogue_initialNoGears;
+        }
+    }
+}
+
 
 [HarmonyPatch(typeof(GrandmaFinalBoss))]
 [HarmonyPatch("OnFinalBlow")]
