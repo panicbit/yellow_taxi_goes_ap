@@ -336,10 +336,9 @@ public class Archipelago
             // Gears
             foreach (var gearArrayIndex in mapArea.gearsId)
             {
-                var isCollected = Data.GearStateGet(
+                var isCollected = Data.GearStateGetAbsolute(
                     (int)mapArea.levelId,
-                    gearArrayIndex / 32,
-                    gearArrayIndex % 32
+                    gearArrayIndex
                 );
 
                 if (isCollected)

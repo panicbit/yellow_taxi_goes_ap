@@ -45,20 +45,18 @@ public class OnPlayerOnTriggerStayPatch
 
             Plugin.logger.LogWarning($"Collected gear `{gearName}`");
 
-            bool alreadyTaken = Data.GearStateGet(
+            bool alreadyTaken = Data.GearStateGetAbsolute(
                 (int)levelId,
-                bonusScript.gearArrayIndex / 32,
-                bonusScript.gearArrayIndex % 32
+                bonusScript.gearArrayIndex
             );
 
             Plugin.logger.LogWarning($"Gear already taken: {alreadyTaken}");
 
             if (!alreadyTaken)
             {
-                Data.GearStateSet(
+                Data.GearStateSetAbsolute(
                     (int)levelId,
-                    bonusScript.gearArrayIndex / 32,
-                    bonusScript.gearArrayIndex % 32,
+                    bonusScript.gearArrayIndex,
                     true
                 );
 
