@@ -249,36 +249,29 @@ public class Archipelago
         }
     }
 
-    public static void OnGearCollected(MapAreaScriptableObject mapArea, int gearArrayIndex)
+    public static void OnGearCollected(Data.LevelId levelId, int gearArrayIndex)
     {
         if (session == null)
         {
             return;
         }
 
-        string location = ArchipelagoGearLocation(mapArea, gearArrayIndex);
+        string location = ArchipelagoGearLocation(levelId, gearArrayIndex);
 
         OnLocationCollected(location);
     }
 
-    static string ArchipelagoGearLocation(MapAreaScriptableObject mapArea, int gearArrayIndex)
+    public static string ArchipelagoGearLocation(Data.LevelId levelId, int gearArrayIndex)
     {
         try
         {
             Plugin.logger.LogInfo($"gear array index: {gearArrayIndex}");
 
-            var apGearIndex = mapArea.gearsId.AsEnumerable()
-                .OrderBy(arrayIndex => arrayIndex)
-                .Select((arrayIndex, apIndex) => (arrayIndex, apIndex))
-                .First((gear) => gear.arrayIndex == gearArrayIndex)
-                .apIndex;
+            var level = Data.GetLevel(levelId);
+            var localLevelName = LocalizationManager.GetTranslation(level.levelName, overrideLanguage: "English");
+            var location = $"{localLevelName} | Gear {gearArrayIndex + 1}";
 
-            Plugin.logger.LogInfo($"YTGV {gearArrayIndex} -> AP {apGearIndex}");
-
-            var localAreaName = LocalizationManager.GetTranslation(mapArea.areaName, overrideLanguage: "English");
-            var location = $"{localAreaName} | Gear {apGearIndex + 1}";
-
-            Plugin.logger.LogWarning($"Got gear: `{location}`");
+            Plugin.logger.LogWarning($"Location: `{location}`");
 
             return location;
         }
@@ -351,7 +344,7 @@ public class Archipelago
 
                 if (isCollected)
                 {
-                    OnGearCollected(mapArea, gearArrayIndex);
+                    OnGearCollected(mapArea.levelId, gearArrayIndex);
                 }
             }
         }

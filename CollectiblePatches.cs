@@ -40,10 +40,13 @@ public class OnPlayerOnTriggerStayPatch
                 return;
             }
 
-            Plugin.logger.LogWarning($"Trying to collect gear");
+            var levelId = GameplayMaster.instance.levelId;
+            var gearName = Archipelago.ArchipelagoGearLocation(levelId, (int)GameplayMaster.instance.levelId);
+
+            Plugin.logger.LogWarning($"Collected gear `{gearName}`");
 
             bool alreadyTaken = Data.GearStateGet(
-                (int)GameplayMaster.instance.levelId,
+                (int)levelId,
                 bonusScript.gearArrayIndex / 32,
                 bonusScript.gearArrayIndex % 32
             );
