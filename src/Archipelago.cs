@@ -95,7 +95,8 @@ public class Archipelago
             loginResult = await session.LoginAsync(
                 game: GAME,
                 name: Slot,
-                itemsHandlingFlags: ItemsHandlingFlags.IncludeOwnItems
+                itemsHandlingFlags: ItemsHandlingFlags.IncludeOwnItems,
+                password: Password
             );
 
             // version: new Version("0.4.4"),
@@ -106,7 +107,6 @@ public class Archipelago
             //     // "TextOnly",
             // ],
             // uuid: null,
-            // password: Password,
             // requestSlotData: false
             // );
         }
