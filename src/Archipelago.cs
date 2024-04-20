@@ -42,18 +42,18 @@ public class Archipelago
 
         GearsReceived = 0;
 
-        Plugin.logger.LogInfo("Trying to connect to AP!");
+        Logger.LogInfo("Trying to connect to AP!");
 
         session = ArchipelagoSessionFactory.CreateSession(Host, Port);
 
-        Plugin.logger.LogWarning($"thread outside: {System.Threading.Thread.CurrentThread.ManagedThreadId}");
+        Logger.LogWarning($"thread outside: {System.Threading.Thread.CurrentThread.ManagedThreadId}");
 
         _ = ConnectSetupAndLogin();
     }
 
     async static Task ConnectSetupAndLogin()
     {
-        Plugin.logger.LogWarning($"thread inside: {System.Threading.Thread.CurrentThread.ManagedThreadId}");
+        Logger.LogWarning($"thread inside: {System.Threading.Thread.CurrentThread.ManagedThreadId}");
 
         MenuV2PopupScript.SpawnNew(
             _title: "Archipelago",
@@ -71,7 +71,7 @@ public class Archipelago
         }
         catch (Exception e)
         {
-            Plugin.logger.LogError($"Failed to connect to AP: {e}");
+            Logger.LogError($"Failed to connect to AP: {e}");
 
             OnGameEnd();
 
@@ -112,7 +112,7 @@ public class Archipelago
         }
         catch (Exception e)
         {
-            Plugin.logger.LogError($"Failed login to AP: {e}");
+            Logger.LogError($"Failed login to AP: {e}");
 
             MenuV2PopupScript.SpawnNew(
                 _title: "Archipelago",
@@ -128,20 +128,20 @@ public class Archipelago
 
         if (loginResult is LoginSuccessful login)
         {
-            Plugin.logger.LogInfo($"Connected to AP!");
+            Logger.LogInfo($"Connected to AP!");
         }
         else if (loginResult is LoginFailure loginFailure)
         {
-            Plugin.logger.LogError($"Failed login to AP:");
+            Logger.LogError($"Failed login to AP:");
 
             foreach (var error in loginFailure.Errors)
             {
-                Plugin.logger.LogError(error);
+                Logger.LogError(error);
             }
 
             foreach (var error in loginFailure.ErrorCodes)
             {
-                Plugin.logger.LogError(error);
+                Logger.LogError(error);
             }
 
             MenuV2PopupScript.SpawnNew(
@@ -156,7 +156,7 @@ public class Archipelago
         }
         else
         {
-            Plugin.logger.LogError("Unknown login result");
+            Logger.LogError("Unknown login result");
 
             OnGameEnd();
             return;
@@ -168,7 +168,7 @@ public class Archipelago
         }
         catch (Exception e)
         {
-            Plugin.logger.LogError($"Failed to set level costs from slot data: {e}");
+            Logger.LogError($"Failed to set level costs from slot data: {e}");
 
             OnGameEnd();
             return;
@@ -189,7 +189,7 @@ public class Archipelago
 
         MenuV2PopupScript.instance?.Close();
 
-        Plugin.logger.LogInfo("Disconnecting from AP!");
+        Logger.LogInfo("Disconnecting from AP!");
 
         try
         {
@@ -197,7 +197,7 @@ public class Archipelago
         }
         catch (Exception e)
         {
-            Plugin.logger.LogError($"Failed to disconnect from AP: {e}");
+            Logger.LogError($"Failed to disconnect from AP: {e}");
         }
         finally
         {
@@ -229,7 +229,7 @@ public class Archipelago
         var item = items.DequeueItem();
         var itemName = items.GetItemName(item.Item);
 
-        Plugin.logger.LogWarning($"!!!! on item received !!!");
+        Logger.LogWarning($"!!!! on item received !!!");
 
         switch (itemName)
         {
@@ -238,12 +238,12 @@ public class Archipelago
                     Interlocked.Increment(ref GearsReceived);
                     Interlocked.Increment(ref Data.gearsUnlockedNumber[Data.gameDataIndex]);
 
-                    Plugin.logger.LogWarning($"Num gears: `{GearsReceived}`");
+                    Logger.LogWarning($"Num gears: `{GearsReceived}`");
                     break;
                 }
             default:
                 {
-                    Plugin.logger.LogError($"Received unknown item: `{itemName}`");
+                    Logger.LogError($"Received unknown item: `{itemName}`");
                     break;
                 }
         }
@@ -265,19 +265,19 @@ public class Archipelago
     {
         try
         {
-            Plugin.logger.LogInfo($"gear array index: {gearArrayIndex}");
+            Logger.LogInfo($"gear array index: {gearArrayIndex}");
 
             var level = Data.GetLevel(levelId);
             var localLevelName = LocalizationManager.GetTranslation(level.levelName, overrideLanguage: "English");
             var location = $"{localLevelName} | Gear {gearArrayIndex + 1}";
 
-            Plugin.logger.LogWarning($"Location: `{location}`");
+            Logger.LogWarning($"Location: `{location}`");
 
             return location;
         }
         catch (Exception e)
         {
-            Plugin.logger.LogError($"Collectible error: {e}");
+            Logger.LogError($"Collectible error: {e}");
 
             return "";
         }
@@ -291,19 +291,19 @@ public class Archipelago
 
         try
         {
-            Plugin.logger.LogInfo($"Trying to send check `{name}` to AP");
+            Logger.LogInfo($"Trying to send check `{name}` to AP");
             var locationId = session.Locations.GetLocationIdFromName(GAME, name);
 
             if (locationId == -1)
             {
-                Plugin.logger.LogError("Location `{}` could not be resolved to an id");
+                Logger.LogError("Location `{}` could not be resolved to an id");
             }
 
             session.Locations.CompleteLocationChecks(locationId);
         }
         catch (Exception e)
         {
-            Plugin.logger.LogError($"Failed to send check `{name}` to AP: {e}");
+            Logger.LogError($"Failed to send check `{name}` to AP: {e}");
         }
     }
 
@@ -351,10 +351,10 @@ public class Archipelago
 
     public static void SetLevelCostsFromSlotData(Dictionary<string, object> slotData)
     {
-        Plugin.logger.LogInfo("Setting level costs from slot data");
+        Logger.LogInfo("Setting level costs from slot data");
 
         var obj = slotData["bombeach_required_gears"];
-        Plugin.logger.LogWarning($"Obj is: `{obj}`, type: `{obj.GetType()}`");
+        Logger.LogWarning($"Obj is: `{obj}`, type: `{obj.GetType()}`");
 
 
         var getInt = (string key) =>
@@ -365,7 +365,7 @@ public class Archipelago
             }
             catch (Exception e)
             {
-                Plugin.logger.LogError($"Failed to get `{key}` from slot data: {e}");
+                Logger.LogError($"Failed to get `{key}` from slot data: {e}");
 
                 throw e;
             }
@@ -393,7 +393,7 @@ public class Archipelago
 
     public static void RestoreLevelCosts()
     {
-        Plugin.logger.LogInfo("Restoring level costs");
+        Logger.LogInfo("Restoring level costs");
 
         foreach (var level in Data.levelDataList)
         {
@@ -427,7 +427,7 @@ public class Archipelago
             return;
         }
 
-        // Plugin.logger.LogWarning($"Gears received: {GearsReceived}");
+        // Logger.LogWarning($"Gears received: {GearsReceived}");
         Data.gearsUnlockedNumber[Data.gameDataIndex] = GearsReceived;
 
         // // Update portals
@@ -445,7 +445,7 @@ public class Archipelago
             GameplayMaster.instance.UpdateLevelCollectedGearsNumber();
         }
 
-        // Plugin.logger.LogWarning($"Gears unlocked after all the updating: {Data.gearsUnlockedNumber[Data.gameDataIndex]}");
+        // Logger.LogWarning($"Gears unlocked after all the updating: {Data.gearsUnlockedNumber[Data.gameDataIndex]}");
     }
 }
 

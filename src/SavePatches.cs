@@ -8,7 +8,7 @@ public class PrepareDataForSavingPatch
 {
     static void Postfix()
     {
-        Plugin.logger.LogInfo($"Saving data to slot {Data.gameDataIndex}!");
+        Logger.LogInfo($"Saving data to slot {Data.gameDataIndex}!");
         Archipelago.SaveSettings();
     }
 }
@@ -19,7 +19,7 @@ public class LoadPatch
 {
     static void Postfix()
     {
-        Plugin.logger.LogInfo($"Loading data from slot {Data.gameDataIndex}!");
+        Logger.LogInfo($"Loading data from slot {Data.gameDataIndex}!");
         Archipelago.LoadSettings();
     }
 }

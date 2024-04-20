@@ -59,8 +59,8 @@ public class MenuVoicesInitPatch
         indexArchipelagoVoice = settings.Count;
         menuVoices[MenuV2Script.indexSettings].Add("Archipelago");
 
-        Plugin.logger.LogInfo($"Archipelago voice index: {indexArchipelagoVoice}");
-        Plugin.logger.LogInfo($"Archipelago original settings length: {originalSettingsLength}");
+        Logger.LogInfo($"Archipelago voice index: {indexArchipelagoVoice}");
+        Logger.LogInfo($"Archipelago original settings length: {originalSettingsLength}");
 
         ___menuSubTitles = [.. menuSubTitles];
         ___menuVoices = menuVoices.Select((voices) => voices.ToArray()).ToList();
@@ -169,7 +169,7 @@ public class MenuSelectionPatch
 
         if (voiceIndex == MenuVoicesInitPatch.indexArchipelagoVoice)
         {
-            Plugin.logger.LogInfo("Selected Archipelago menu!");
+            Logger.LogInfo("Selected Archipelago menu!");
             menuIndex = MenuVoicesInitPatch.archipelagoMenu.index;
             voiceIndex = 0;
             Sound.Play_Unpausable("SoundMenuSelect", 1f, 1f);
@@ -178,7 +178,7 @@ public class MenuSelectionPatch
         }
         else
         {
-            Plugin.logger.LogError($"Unhandled menu,voice: {menuIndex},{voiceIndex}");
+            Logger.LogError($"Unhandled menu,voice: {menuIndex},{voiceIndex}");
             return true;
         }
     }

@@ -43,14 +43,14 @@ public class OnPlayerOnTriggerStayPatch
             var levelId = GameplayMaster.instance.levelId;
             var gearName = Archipelago.ArchipelagoGearLocation(levelId, (int)GameplayMaster.instance.levelId);
 
-            Plugin.logger.LogWarning($"Collected gear `{gearName}`");
+            Logger.LogWarning($"Collected gear `{gearName}`");
 
             bool alreadyTaken = Data.GearStateGetAbsolute(
                 (int)levelId,
                 bonusScript.gearArrayIndex
             );
 
-            Plugin.logger.LogWarning($"Gear already taken: {alreadyTaken}");
+            Logger.LogWarning($"Gear already taken: {alreadyTaken}");
 
             if (!alreadyTaken)
             {
@@ -116,7 +116,7 @@ public class SaveGamePatch
 {
     static void Postfix()
     {
-        Plugin.logger.LogWarning("Save game data called!");
+        Logger.LogWarning("Save game data called!");
 
         if (Archipelago.Enabled)
         {
@@ -131,7 +131,7 @@ public class LoadGamePatch
 {
     static void Postfix()
     {
-        Plugin.logger.LogWarning("Load game data called!");
+        Logger.LogWarning("Load game data called!");
 
         if (Archipelago.Enabled)
         {
@@ -146,7 +146,7 @@ public class CreateLevelDataPatch
 {
     static void Postfix()
     {
-        Plugin.logger.LogError("CreateLevelData called!");
+        Logger.LogError("CreateLevelData called!");
     }
 }
 
@@ -197,7 +197,7 @@ public class VisualsPatch
         }
         catch (Exception e)
         {
-            Plugin.logger.LogError($"Failed to patch visuals: {e}");
+            Logger.LogError($"Failed to patch visuals: {e}");
         }
     }
 
@@ -209,7 +209,7 @@ public class VisualsPatch
         var allVertices = new List<Vector3>();
         var allTriangles = new List<int>();
 
-        Plugin.logger.LogWarning("======= vertice lengths");
+        Logger.LogWarning("======= vertice lengths");
         foreach (var primitive in gltfMesh.Primitives)
         {
             var triangles = primitive.GetTriangleIndices()
