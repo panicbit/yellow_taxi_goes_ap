@@ -1,16 +1,11 @@
 using System;
-using System.CodeDom;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Extensions.Enum;
 using HarmonyLib;
-using I2.Loc;
 using UnityEngine;
-using UnityEngine.Bindings;
 using SharpGLTF.Schema2;
-using UnityEngine.Rendering;
-using UnityEngine.UIElements;
+using yellow_taxi_goes_ap.wrapper;
 
 namespace yellow_taxi_goes_ap;
 
@@ -39,6 +34,8 @@ public class OnPlayerOnTriggerStayPatch
             {
                 return;
             }
+
+            var x = Game.Maps;
 
             var levelId = GameplayMaster.instance.levelId;
             var gearName = Archipelago.ArchipelagoGearLocation(levelId, bonusScript.gearArrayIndex);
