@@ -110,13 +110,13 @@ public class MenuSelectionPatch
     static int menuIndex
     {
         get => MenuV2Script.instance.menuIndex;
-        set { MenuV2Script.instance.menuIndex = value; }
+        set => MenuV2Script.instance.menuIndex = value;
     }
 
     static int voiceIndex
     {
         get => MenuV2Script.instance.voiceIndex;
-        set { MenuV2Script.instance.voiceIndex = value; }
+        set => MenuV2Script.instance.voiceIndex = value;
     }
 
     static bool Prefix()
@@ -252,13 +252,13 @@ public class MenuBackPatch
     static int menuIndex
     {
         get => MenuV2Script.instance.menuIndex;
-        set { MenuV2Script.instance.menuIndex = value; }
+        set => MenuV2Script.instance.menuIndex = value;
     }
 
     static int voiceIndex
     {
         get => MenuV2Script.instance.voiceIndex;
-        set { MenuV2Script.instance.voiceIndex = value; }
+        set => MenuV2Script.instance.voiceIndex = value;
     }
 
     static bool Prefix()
@@ -285,13 +285,13 @@ public class VoicesUpdatePatch
     static int menuIndex
     {
         get => MenuV2Script.instance.menuIndex;
-        set { MenuV2Script.instance.menuIndex = value; }
+        set => MenuV2Script.instance.menuIndex = value;
     }
 
     static int voiceIndex
     {
         get => MenuV2Script.instance.voiceIndex;
-        set { MenuV2Script.instance.voiceIndex = value; }
+        set => MenuV2Script.instance.voiceIndex = value;
     }
 
     static void Postfix()
