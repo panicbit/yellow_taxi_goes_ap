@@ -164,7 +164,9 @@ public class Archipelago
 
         try
         {
-            SetLevelCostsFromSlotData(login.SlotData);
+            var slotData = SlotData.FromDictionary(login.SlotData);
+
+            SetLevelCostsFromSlotData(slotData);
         }
         catch (Exception e)
         {
@@ -349,27 +351,9 @@ public class Archipelago
         }
     }
 
-    public static void SetLevelCostsFromSlotData(Dictionary<string, object> slotData)
+    public static void SetLevelCostsFromSlotData(SlotData slotData)
     {
         Logger.LogInfo("Setting level costs from slot data");
-
-        var obj = slotData["bombeach_required_gears"];
-        Logger.LogWarning($"Obj is: `{obj}`, type: `{obj.GetType()}`");
-
-
-        var getInt = (string key) =>
-        {
-            try
-            {
-                return (int)(Int64)slotData[key];
-            }
-            catch (Exception e)
-            {
-                Logger.LogError($"Failed to get `{key}` from slot data: {e}");
-
-                throw e;
-            }
-        };
 
         foreach (var level in Data.levelDataList)
         {
@@ -377,16 +361,16 @@ public class Archipelago
 
             switch (level.levelName)
             {
-                case "LEVEL_NAME_MORIOS_HOME": cost = getInt("morios_island_required_gears"); break;
-                case "LEVEL_NAME_BOMBEACH": cost = getInt("bombeach_required_gears"); break;
-                case "LEVEL_NAME_ARCADE_PANIK": cost = getInt("arcade_plaza_required_gears"); break;
-                case "LEVEL_NAME_PIZZA_TIME": cost = getInt("pizza_time_required_gears"); break;
-                case "LEVEL_NAME_TOSLA_OFFICES": cost = getInt("tosla_square_required_gears"); break;
-                case "LEVEL_NAME_CITY": cost = getInt("maurizios_city_required_gears"); break;
-                case "LEVEL_NAME_CRASH_TEST_INDUSTRIES": cost = getInt("crash_test_industries_required_gears"); break;
-                case "LEVEL_NAME_MORIOS_MIND": cost = getInt("morios_mind_required_gears"); break;
-                case "LEVEL_NAME_STARMAN_CASTLE": cost = getInt("observing_required_gears"); break;
-                case "LEVEL_NAME_TOSLA_HQ": cost = getInt("anticipation_required_gears"); break;
+                case "LEVEL_NAME_MORIOS_HOME": cost = slotData.MoriosIslandRequiredGears; break;
+                case "LEVEL_NAME_BOMBEACH": cost = slotData.BombeachRequiredGears; break;
+                case "LEVEL_NAME_ARCADE_PANIK": cost = slotData.ArcadePlazaRequiredGears; break;
+                case "LEVEL_NAME_PIZZA_TIME": cost = slotData.PizzaTimeRequiredGears; break;
+                case "LEVEL_NAME_TOSLA_OFFICES": cost = slotData.ToslaSquareRequiredGears; break;
+                case "LEVEL_NAME_CITY": cost = slotData.MauriziosCityRequiredGears; break;
+                case "LEVEL_NAME_CRASH_TEST_INDUSTRIES": cost = slotData.CrashTestIndustriesRequiredGears; break;
+                case "LEVEL_NAME_MORIOS_MIND": cost = slotData.MoriosMindRequiredGears; break;
+                case "LEVEL_NAME_STARMAN_CASTLE": cost = slotData.ObservingRequiredGears; break;
+                case "LEVEL_NAME_TOSLA_HQ": cost = slotData.AnticipationRequiredGears; break;
             }
         }
     }
