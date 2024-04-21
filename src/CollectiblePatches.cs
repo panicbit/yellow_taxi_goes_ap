@@ -41,7 +41,7 @@ public class OnPlayerOnTriggerStayPatch
             }
 
             var levelId = GameplayMaster.instance.levelId;
-            var gearName = Archipelago.ArchipelagoGearLocation(levelId, (int)GameplayMaster.instance.levelId);
+            var gearName = Archipelago.ArchipelagoGearLocation(levelId, bonusScript.gearArrayIndex);
 
             Logger.LogWarning($"Collected gear `{gearName}`");
 
