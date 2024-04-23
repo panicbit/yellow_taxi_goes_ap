@@ -51,6 +51,10 @@
     <Copy SourceFiles="@(MySourceFiles)"
       DestinationFolder="C:\Program Files (x86)\Steam\steamapps\common\Yellow Taxi Goes Vroom\BepInEx\plugins\YellowTaxiGoesAp" />
 
+    <Copy SourceFiles="assets/archipelago.gltf"
+      DestinationFolder="C:\Program Files (x86)\Steam\steamapps\common\Yellow Taxi Goes Vroom\BepInEx\plugins\YellowTaxiGoesAp" />
+
+
     <Message Text="Copied build files" Importance="High" />
   </Target>
 

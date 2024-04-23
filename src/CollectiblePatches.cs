@@ -3,14 +3,9 @@ using System.CodeDom;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Extensions.Enum;
 using HarmonyLib;
-using I2.Loc;
 using UnityEngine;
-using UnityEngine.Bindings;
 using SharpGLTF.Schema2;
-using UnityEngine.Rendering;
-using UnityEngine.UIElements;
 
 namespace yellow_taxi_goes_ap;
 
@@ -25,7 +20,7 @@ public class OnPlayerOnTriggerStayPatch
             return;
         }
 
-        var bonusScript = other.GetComponent<BonusScript>(); ;
+        var bonusScript = other.GetComponent<BonusScript>();
 
         if (bonusScript == null)
         {
