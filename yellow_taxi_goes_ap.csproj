@@ -54,7 +54,7 @@
       />
       <OutputDir
         Condition="$([MSBuild]::IsOSPlatform('Linux'))"
-        Include="$HOME/.steam/steam/steamapps/common/Yellow Taxi Goes Vroom/BepInEx/plugins/YellowTaxiGoesAp"
+        Include="$(HOME)/.steam/steam/steamapps/common/Yellow Taxi Goes Vroom/BepInEx/plugins/YellowTaxiGoesAp"
       />
     </ItemGroup>
 
