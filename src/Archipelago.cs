@@ -9,6 +9,7 @@ using Archipelago.MultiClient.Net.Helpers;
 using Archipelago.MultiClient.Net.Models;
 using Archipelago.MultiClient.Net.Packets;
 using I2.Loc;
+using TMPro;
 
 namespace yellow_taxi_goes_ap;
 
@@ -249,6 +250,16 @@ public class Archipelago
                     break;
                 }
         }
+
+        // Update portals
+        for (int i = 0; i < PortalScript.list.Count; i++)
+        {
+            if (!(PortalScript.list[i] == null))
+            {
+                PortalScript.list[i].CostUpdateTry();
+                PortalScript.list[i].UpdatePortalToLevelName();
+            }
+        }
     }
 
     public static void OnGearCollected(Data.LevelId levelId, int gearArrayIndex)
@@ -413,16 +424,6 @@ public class Archipelago
 
         // Logger.LogWarning($"Gears received: {GearsReceived}");
         Data.gearsUnlockedNumber[Data.gameDataIndex] = GearsReceived;
-
-        // // Update portals
-        // for (int i = 0; i < PortalScript.list.Count; i++)
-        // {
-        //     if (!(PortalScript.list[i] == null))
-        //     {
-        //         PortalScript.list[i].CostUpdateTry();
-        //         PortalScript.list[i].UpdatePortalToLevelName();
-        //     }
-        // }
 
         if (!GameplayMaster.instance.timeAttackLevel)
         {

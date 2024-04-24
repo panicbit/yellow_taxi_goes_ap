@@ -45,11 +45,21 @@
     <Message Text="Executing CopyDLLs task" Importance="High" />
 
     <ItemGroup>
-      <MySourceFiles Include="$(TargetDir)*.dll;$(TargetDir)$(ProjectName).pdb" />
+      <Artifacts Include="$(TargetDir)*.dll" />
+      <Artifacts Include="$(TargetDir)$(ProjectName).pdb" />
+      <Artifacts Include="$(ProjectDir)/assets/archipelago.gltf" />
+      <OutputDir
+        Condition="$([MSBuild]::IsOSPlatform('Windows'))"
+        Include="C:\Program Files (x86)\Steam\steamapps\common\Yellow Taxi Goes Vroom\BepInEx\plugins\YellowTaxiGoesAp"
+      />
+      <OutputDir
+        Condition="$([MSBuild]::IsOSPlatform('Linux'))"
+        Include="$HOME/.steam/steam/steamapps/common/Yellow Taxi Goes Vroom/BepInEx/plugins/YellowTaxiGoesAp"
+      />
     </ItemGroup>
 
-    <Copy SourceFiles="@(MySourceFiles)"
-      DestinationFolder="C:\Program Files (x86)\Steam\steamapps\common\Yellow Taxi Goes Vroom\BepInEx\plugins\YellowTaxiGoesAp" />
+    <Copy SourceFiles="@(Artifacts)"
+      DestinationFolder="@(OutputDir)" />
 
     <Message Text="Copied build files" Importance="High" />
   </Target>
