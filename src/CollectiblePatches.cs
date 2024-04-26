@@ -61,6 +61,28 @@ public class OnPlayerOnTriggerStayPatch
             }
         }
     }
+
+    static void Postfix(Collider other)
+    {
+        if (!Tick.IsGameRunning || !Archipelago.Enabled)
+        {
+            return;
+        }
+
+        var bonusScript = other.GetComponent<BonusScript>();
+
+        if (bonusScript == null)
+        {
+            return;
+        }
+
+        // On gear collect
+        if (bonusScript.myIdentity == BonusScript.Identity.gear /* && GameplayMaster.instance.levelId >= Data.LevelId.Hub */)
+        {
+            HudMasterScript.instance.UpdateAreaGears();
+            HudMasterScript.instance.UpdateGearsText();
+        }
+    }
 }
 
 [HarmonyPatch(typeof(PersonScenziatoV2))]
